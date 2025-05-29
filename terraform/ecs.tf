@@ -1,7 +1,6 @@
 resource "aws_ecs_cluster" "medusa_cluster" {
   name = "medusa-cluster"
 }
-
 resource "aws_ecs_task_definition" "medusa_task" {
   family                   = "medusa-task"
   requires_compatibilities = ["FARGATE"]
