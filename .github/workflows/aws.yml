@@ -49,23 +49,26 @@ jobs:
           docker pull naveenkholi/medsa:latest
           echo "Pulled image: naveenkholi/medsa:latest"
 
-      # Step 8: Update ECS task definition
+      # Step 7: Update ECS task definition with new image
       - name: Update ECS task definition
         id: update-task-def
         run: |
-          TASK_DEF=$(aws ecs describe-task-definition \
+          set -euo pipefail
+
+          echo "Fetching latest revision of ECS task definition family: medusa-task"
+          LATEST_TASK_DEF=$(aws ecs describe-task-definition \
             --task-definition medusa-task \
             --region us-east-1)
 
-          NEW_TASK_DEF=$(echo "$TASK_DEF" | jq \
+          NEW_TASK_DEF=$(echo "$LATEST_TASK_DEF" | jq \
             '.taskDefinition |
-            .containerDefinitions[0].image = "naveenkholi/medsa:latest" |
-            del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+             .containerDefinitions[0].image = "naveenkholi/medsa:latest" |
+             del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
 
+          echo "Registering new ECS task definition"
           NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
-            --region us-east-1 \
             --cli-input-json "$NEW_TASK_DEF" \
-            | jq -r '.taskDefinition.taskDefinitionArn')
+            --region us-east-1 | jq -r '.taskDefinition.taskDefinitionArn')
 
           echo "task_definition_arn=$NEW_TASK_DEF_ARN" >> $GITHUB_OUTPUT
 
