@@ -49,25 +49,7 @@ jobs:
           docker pull naveenkholi/medsa:latest
           echo "Pulled image: naveenkholi/medsa:latest"
 
-    # Step 8: Update ECS task definition
-      - name: Update ECS task definition
-        id: update-task-def
-        run: aws ecs list-task-definitions --region us-east-1
-          TASK_DEF=$(aws ecs describe-task-definition \
-            --task-definition medsa-task \
-            --region us-east-1)
-
-          NEW_TASK_DEF=$(echo "$TASK_DEF" | jq \
-            '.taskDefinition medsa-store-task
-            .containerDefinitions[0].image = "naveenkholi/medsa:latest" |
-            del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
-
-          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
-            --region us-east-1 \
-            --cli-input-json "$NEW_TASK_DEF" \
-            | jq -r '.taskDefinition.taskDefinitionArn')
-
-          echo "task_definition_arn=$NEW_TASK_DEF_ARN" >> $GITHUB_OUTPUT
+   
 
       # Step 9: Update ECS service
       - name: Update ECS service
