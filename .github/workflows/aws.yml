@@ -28,12 +28,12 @@ jobs:
       # Step 4: Build the Docker image
       - name: Build Docker image
         run: |
-          docker build -t nraj60401@gmail.com/medusa-store:latest .
+          docker build -t naveenkholi/medsa:latest .
 
       # Step 5: Push Docker image to Docker Hub
       - name: Push Docker image to Docker Hub
         run: |
-          docker push nraj60401@gmail.com/medusa-store:latest
+         docker push naveenkholi/medsa:latest
 
       # Step 6: Configure AWS credentials
       - name: Configure AWS credentials
